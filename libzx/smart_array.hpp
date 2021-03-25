@@ -23,7 +23,7 @@ public:
         std::copy(s.begin(), s.end(), data::get());
     }
 
-    auto &operator=(unique_array&& a) {
+    auto& operator=(unique_array&& a) {
         data::reset(a.release());
         len = a.len;
         a.len = 0;
