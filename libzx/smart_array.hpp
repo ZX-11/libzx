@@ -86,14 +86,4 @@ public:
     T* end() const noexcept { return data::get() + len; }
 };
 
-// template<typename T>
-// inline auto operator==(const unique_array<T> a1, unique_array<T> a2) {
-//     return (a1 <=> a2) == 0;
-// }
-
-// template<typename T>
-// inline auto operator==(const shared_array<T> a1, shared_array<T> a2) {
-//     return (a1 <=> a2) == 0;
-// }
-
 }
