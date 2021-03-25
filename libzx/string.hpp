@@ -10,8 +10,8 @@ public:
     string() :       vector()  { }
     string(char c) : vector{c} { }
     string(const char* s) :   vector(strlen(s)) { strcpy(begin(), s); }
-    string(const string& s) : vector(s.size())  { strcpy(begin(), s.begin()); puts("copy"); }
-    string(string&& s) :      vector(s.size())  { data = std::move(s.data); puts("move"); }
+    string(const string& s) : vector(s.size())  { strcpy(begin(), s.begin()); }
+    string(string&& s) :      vector(s.size())  { data = std::move(s.data); }
     string(const slice<char>& s) : vector(s.size()) { strncpy(begin(), s.begin(), s.size()); }
 
     auto& operator=(const string& s) {
