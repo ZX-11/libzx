@@ -44,16 +44,15 @@ public:
         return data[len-1] <=> s.data[len-1];
     }
 
+    auto operator==(const slice& s) const {
+        return (*this <=> s) == 0;
+    }
+
     size_t size() const noexcept { return len; }
     T& front() noexcept { return data[0]; }
     T& back() noexcept { return data[len-1]; }
     T* begin() const noexcept { return data; }
     T* end() const noexcept { return data + len; }
 };
-
-template<typename T>
-inline auto operator==(const slice<T>& s1, const slice<T>& s2) {
-    return (s1 <=> s2) == 0;
-}
 
 }
