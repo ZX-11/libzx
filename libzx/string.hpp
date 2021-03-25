@@ -7,8 +7,8 @@ namespace libzx {
 
 class string : public vector<char> {
 public:
-    string() :       vector()  { data[0] = 0; }
-    string(char c) : vector{c} { data[1] = 0; }
+    string() :       vector()  { }
+    string(char c) : vector{c} { }
     string(const char* s) :   vector(strlen(s)) { strcpy(begin(), s); }
     string(const string& s) : vector(s.size())  { strcpy(begin(), s.begin()); puts("copy"); }
     string(string&& s) :      vector(s.size())  { data = std::move(s.data); puts("move"); }
@@ -74,6 +74,7 @@ public:
     }
 
     friend auto& getline(std::istream& in, string& s);
+    friend auto& operator>>(std::istream& in, string& s);
 };
 
 template<typename T>
@@ -99,6 +100,7 @@ inline auto& operator<<(std::ostream& out, const string& s) {
 }
 
 inline auto& operator>>(std::istream& in, string& s) {
+    s[0] = 0; s.len = 0;
     while (isspace(in.peek())) in.get();
     for (; !isspace(in.peek()) && in.peek() != EOF; in.get()) {
         s.push_back(in.peek());
