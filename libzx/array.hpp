@@ -31,7 +31,7 @@ public:
         return data[N-1] <=> a.data[N-1];
     }
 
-    T &at(size_t i) {
+    T& at(size_t i) {
         if (i >= len)
             throw std::out_of_range("array: index (which is " + std::to_string(i) +
                 ") >= this->size() (which is " + std::to_string(len) + ")");
