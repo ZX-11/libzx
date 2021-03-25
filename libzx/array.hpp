@@ -31,7 +31,11 @@ public:
         return data[N-1] <=> a.data[N-1];
     }
 
-    T& at(size_t i) {
+    auto operator==(const array& a) const {
+        return (*this <=> a) == 0;
+    }
+
+    T &at(size_t i) {
         if (i >= len)
             throw std::out_of_range("array: index (which is " + std::to_string(i) +
                 ") >= this->size() (which is " + std::to_string(len) + ")");
@@ -47,10 +51,5 @@ public:
     T* begin() const noexcept { return &data[0]; }
     T* end() const noexcept { return &data[len]; }
 };
-
-template<typename T, size_t N>
-inline auto operator==(const array<T,N>& a1, const array<T,N>& a2) {
-    return (a1 <=> a2) == 0;
-}
 
 }
