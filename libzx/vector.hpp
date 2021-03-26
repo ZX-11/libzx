@@ -23,11 +23,11 @@ protected:
     }
 public:
     vector() : data(16) {}
-    vector(size_t len, size_t min_cap = 16) : data(std::max(len + len / 3, min_cap)), len(len) {}
-    vector(std::initializer_list<T> l) : data(l.size() + l.size() / 3) {
+    vector(size_t len, size_t min_cap = 16) : data(std::max(len + len/3, min_cap)), len(len) {}
+    vector(std::initializer_list<T> l) : data(l.size() + l.size()/3) {
         for (auto&& i : l) data[len++] = std::move(i);
     }
-    vector(const slice<T>& s) : data(s.size() + s.size() / 3), len(s.size()) {
+    vector(const slice<T>& s) : data(s.size() + s.size()/3), len(s.size()) {
         std::copy(s.begin(), s.end(), data.get());
     }
     vector(const vector& v) : data(v.data.clone()), len(v.len) { }
