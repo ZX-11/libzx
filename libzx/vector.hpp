@@ -31,7 +31,7 @@ public:
         std::copy(s.begin(), s.end(), data.get());
     }
     vector(const vector& v) : data(v.data.clone()), len(v.len) { }
-    vector(vector&& v) : data(v.data), len(v.len) { }
+    vector(vector&& v) : data(v.data), len(v.len) { v.len = 0; }
 
     auto& operator=(const vector& v) {
         data = std::move(v.data.clone());
@@ -42,6 +42,7 @@ public:
     auto& operator=(vector&& v) noexcept {
         data = std::move(v.data);
         len = v.len;
+        v.len = 0;
         return *this;
     }
 
