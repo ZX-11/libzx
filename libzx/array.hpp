@@ -12,11 +12,7 @@ class array {
 public:
     array() = default;
     array(std::initializer_list<T> l) {
-        size_t c = 0;
-        for (auto&& i : l) {
-            data[c++] = std::move(i);
-            if (c == len) break;
-        }
+        std::move(l.begin(), l.begin() + std::min(l.size(), len), data);
     }
     array(slice<T> s) {
         std::copy(s.begin(), s.begin() + std::min(s.size(), len), data);
