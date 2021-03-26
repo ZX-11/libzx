@@ -17,7 +17,7 @@ public:
     unique_array(size_t size) : data(new T[size]()), len(size) { }
     unique_array(unique_array&& a) : data(a.release()), len(a.len) { a.len = 0; }
     unique_array(std::initializer_list<T> l) : data(new T[l.size()]) {
-        for (auto&& i : l) (*this)[len++] = std::move(i);
+        std::move(l.begin(), l.end(), data::get());
     }
     unique_array(slice<T> s) : data(new T[s.size()]()), len(s.size()) {
         std::copy(s.begin(), s.end(), data::get());
