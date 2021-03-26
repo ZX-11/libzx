@@ -58,7 +58,7 @@ public:
         return *this;
     }
 
-    T& pop_back() noexcept { return len > 0 ? data[--len] : data[0]; }
+    T pop_back() noexcept { return len > 0 ? std::move(data[--len]) : T(); }
 
     T& operator[](size_t i) noexcept { return data[i]; }
 
