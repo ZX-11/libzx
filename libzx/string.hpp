@@ -11,7 +11,7 @@ public:
     string(char c) : vector{c} { }
     string(const char* s) :   vector(strlen(s)) { strcpy(begin(), s); }
     string(const string& s) : vector(s.size())  { strcpy(begin(), s.begin()); }
-    string(string&& s) :      vector(s.size())  { data = std::move(s.data); }
+    string(string&& s) :      vector(s.size())  { data = std::move(s.data); s.len = 0; }
     string(const slice<char>& s) : vector(s.size()) { strncpy(begin(), s.begin(), s.size()); }
 
     auto& operator=(const string& s) {
@@ -25,6 +25,12 @@ public:
         vector::push_back(c);
         *end() = 0;
         return *this;
+    }
+
+    auto pop_back() {
+        auto r = vector::pop_back();
+        *end() = 0;
+        return r;
     }
 
     auto& operator+=(const string& s) { 
