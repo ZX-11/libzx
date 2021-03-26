@@ -15,8 +15,8 @@ protected:
 
     void grow(size_t size = 1) {
         auto new_cap = std::max(data.size() * 2, data.size() + size);
-        auto new_data = unique_array(new_cap);
-        std::move(data.begin(), data.end(), new_data);
+        auto new_data = unique_array<T>(new_cap);
+        std::move(data.begin(), data.end(), new_data.begin());
         data = std::move(new_data);
     }
 public:
