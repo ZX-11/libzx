@@ -1,6 +1,6 @@
 #pragma once
-#include <stdexcept>
 #include <string>
+#include <stdexcept>
 
 namespace libzx {
 
@@ -63,25 +63,5 @@ public:
     T* begin() const noexcept { return data; }
     T* end() const noexcept { return data + len; }
 };
-
-template<typename T>
-concept comparable = requires(T t) { t <=> t; };
-
-template<comparable T>
-void sort(slice<T> s) {
-    if (s.size() == 0) return;
-    auto p = &s.front(), q = &s.back();
-    auto&& key = s.front();
-    while (p <= q) {
-        while (*p < key) p++;
-        while (*q > key) q--;
-        if (p <= q) {
-            std::swap(*p, *q);
-            p++, q--;
-        }
-    }
-    if (q > &s.front()) sort(slice<T>(s.begin(), q+1));
-    if (p < &s.back()) sort(slice<T>(p, s.end()));
-}
 
 }
