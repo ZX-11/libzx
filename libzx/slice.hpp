@@ -1,14 +1,9 @@
 #pragma once
 #include <string>
 #include <stdexcept>
+#include "concept.hpp"
 
 namespace libzx {
-
-template<typename T>
-concept iterable = requires(T t) { t.begin(); t.end(); t[0]; };
-
-template<typename T>
-concept iterator = requires(T a, T b) { a++; *a; b - a; };
 
 // slice is a reference to a continuous space;
 // it is undefined to refer to discontinuous spaces;
