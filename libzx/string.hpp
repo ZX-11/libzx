@@ -105,6 +105,11 @@ inline auto& operator<<(std::ostream& out, const string& s) {
     return out << s.c_str();
 }
 
+inline auto& operator<<(std::ostream& out, const slice<char>& s) {
+    for (char c : s) out.put(c);
+    return out;
+}
+
 inline auto& operator>>(std::istream& in, string& s) {
     s[0] = 0; s.len = 0;
     while (isspace(in.peek())) in.get();
