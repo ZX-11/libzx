@@ -7,7 +7,7 @@ template<comparable T>
 void sort(slice<T> s) {
     if (s.size() == 0) return;
     auto p = &s.front(), q = &s.back();
-    auto&& key = s.front();
+    auto&& key = s[s.size() / 2];
     while (p <= q) {
         while (*p < key) p++;
         while (*q > key) q--;
@@ -24,7 +24,7 @@ template<typename T>
 void sort(slice<T> s, std::function<bool(T&,T&)> less) {
     if (s.size() == 0) return;
     auto p = &s.front(), q = &s.back();
-    auto&& key = s.front();
+    auto&& key = s[s.size() / 2];
     while (p <= q) {
         while (less(*p, key)) p++;
         while (less(key, *q)) q--;
