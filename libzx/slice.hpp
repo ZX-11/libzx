@@ -17,6 +17,7 @@ template<typename T>
 class slice {
     T *const data;
     const size_t len = 0;
+    slice(T* data, size_t len) : data(data), len(len) {}
 public:
     template<size_t N>
     slice(T (&data)[N]) : data(data), len(N) {}
@@ -32,6 +33,14 @@ public:
                  ") >= this->size() (which is " + std::to_string(len) + ")");
         else
             return data[i];
+    }
+
+    auto sub(size_t begin, size_t end) {
+        return slice<T>(&at(begin), std::min(end,len)-begin);
+    }
+
+    auto sub(size_t begin) {
+        return slice<T>(&at(begin), len-begin);
     }
 
     auto operator<=>(const slice& s) const {
@@ -54,5 +63,25 @@ public:
     T* begin() const noexcept { return data; }
     T* end() const noexcept { return data + len; }
 };
+
+template<typename T>
+concept comparable = requires(T t) { t <=> t; };
+
+template<comparable T>
+void sort(slice<T> s) {
+    if (s.size() == 0) return;
+    auto p = &s.front(), q = &s.back();
+    auto&& key = s.front();
+    while (p <= q) {
+        while (*p < key) p++;
+        while (*q > key) q--;
+        if (p <= q) {
+            std::swap(*p, *q);
+            p++, q--;
+        }
+    }
+    if (q > &s.front()) sort(slice<T>(s.begin(), q+1));
+    if (p < &s.back()) sort(slice<T>(p, s.end()));
+}
 
 }
