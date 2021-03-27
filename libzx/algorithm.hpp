@@ -24,7 +24,7 @@ void sort(slice<T> s) {
 }
 
 template<typename T>
-void sort(slice<T> s, std::function<bool(T&,T&)> less = std::less<T>()) {
+void sort(slice<T> s, std::function<bool(T&,T&)> less) {
     if (s.size() == 0) return;
     auto p = &s.front(), q = &s.back();
     auto&& key = s.front();
