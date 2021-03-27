@@ -3,9 +3,6 @@
 
 namespace libzx {
 
-template<typename T>
-concept comparable = requires(T t) { t <=> t; };
-
 template<comparable T>
 void sort(slice<T> s) {
     if (s.size() == 0) return;
