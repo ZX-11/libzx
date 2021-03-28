@@ -42,6 +42,13 @@ class hashset {
         }
         return (T*)nullptr;
     }
+
+    size_t first() {
+        for (auto i : range(data)) {
+            if (occupied[i]) return i;
+        }
+        return data.size();
+    }
 public:
     hashset(size_t min_cap = 16) : data(min_cap), occupied(min_cap) {}
 
@@ -72,6 +79,22 @@ public:
         }
         return false;
     }
+
+    struct iter {
+        hashset* set;
+        size_t index;
+        auto& operator++() {
+            do {
+                index++;
+            } while (index < set->data.size() && !set->occupied[index]);
+            return *this;
+        }
+        auto operator!=(iter& i) { return index != i.index; }
+        auto& operator*() { return set->data[index]; }
+    };
+
+    auto begin() { return iter{ this, first() }; }
+    auto end() { return iter{ this, data.size() }; }
 };
 
 }
