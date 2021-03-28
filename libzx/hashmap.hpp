@@ -1,7 +1,6 @@
 #pragma once
 
 #include <optional>
-#include <stdexcept>
 #include "hash.hpp"
 #include "range.hpp"
 #include "string.hpp"
