@@ -3,7 +3,6 @@
 #include <optional>
 #include "hash.hpp"
 #include "range.hpp"
-#include "string.hpp"
 #include "concepts.hpp"
 #include "smart_array.hpp"
 
