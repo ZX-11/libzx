@@ -62,7 +62,7 @@ public:
     hashmap(size_t min_cap = 16) : data(min_cap), occupied(min_cap) {}
 
     auto& set(convertible_to<K> auto&& key, convertible_to<V> auto&& value) {
-        if (cap() == 0 || payload() > 0.6) grow();
+        if (cap() == 0 || payload() > 0.75) grow();
         for (size_t i = hash(key) % cap(), j = 0; j < cap(); i = (i+1) % cap(), j++) {
             if (!occupied[i]) {
                 data[i] = record{
