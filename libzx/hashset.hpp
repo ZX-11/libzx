@@ -1,6 +1,7 @@
 #pragma once
 
 #include "hash.hpp"
+#include "range.hpp"
 #include "concepts.hpp"
 #include "smart_array.hpp"
 
