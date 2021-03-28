@@ -1,8 +1,9 @@
 #pragma once
-
 #include <optional>
+#include <stdexcept>
 #include "hash.hpp"
 #include "range.hpp"
+#include "string.hpp"
 #include "concepts.hpp"
 #include "smart_array.hpp"
 
@@ -50,6 +51,13 @@ class hashmap {
         }
         return (record*)nullptr;
     }
+
+    size_t first() {
+        for (auto i : range(data)) {
+            if (occupied[i]) return i;
+        }
+        return data.size();
+    }
 public:
     hashmap(size_t min_cap = 16) : data(min_cap), occupied(min_cap) {}
 
@@ -76,9 +84,8 @@ public:
         return find(key) != nullptr;
     }
 
-    auto get(const K& key) {
-        if (auto t = find(key); t != nullptr)
-                return std::optional<std::reference_wrapper<V>>(t->value);
+    std::optional<std::reference_wrapper<V>> get(const K& key) {
+        if (auto t = find(key); t != nullptr) return std::optional<std::reference_wrapper<V>>(t->value);
         return std::nullopt;
     }
 
@@ -90,6 +97,22 @@ public:
         }
         return false;
     }
+
+    struct iter {
+        hashmap* map;
+        size_t index;
+        auto& operator++() {
+            do {
+                index++;
+            } while (index < map->data.size() && !map->occupied[index]);
+            return *this;
+        }
+        auto operator!=(iter& i) { return index != i.index; }
+        auto& operator*() { return map->data[index]; }
+    };
+
+    auto begin() { return iter{ this, first() }; }
+    auto end() { return iter{ this, data.size() }; }
 };
 
 }
