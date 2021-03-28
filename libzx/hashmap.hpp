@@ -76,7 +76,7 @@ public:
         return find(key) != nullptr;
     }
 
-    std::optional<std::reference_wrapper<V>> get(const K& key) {
+    auto get(const K& key) {
         if (auto t = find(key); t != nullptr) return std::optional<std::reference_wrapper<V>>(t->value);
         return std::nullopt;
     }
