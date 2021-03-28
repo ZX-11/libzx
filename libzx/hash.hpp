@@ -15,7 +15,8 @@ inline size_t hash(const string& s) {
 }
 
 inline size_t hash(integral auto i) {
-    return static_cast<size_t>(i);
+    auto t = static_cast<size_t>(i);
+    return t * 2654435761;
 }
 
 }
