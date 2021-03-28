@@ -16,7 +16,7 @@ class hashset {
     double payload() { return (double)len / (double)data.size(); }
 
     void grow() {
-        auto new_cap = std::max(data.size() * 2, data.size() + 1);
+        auto new_cap = data.size() * 2 + 1;
         auto new_data = unique_array<T>(new_cap);
         auto new_occupied = unique_array<bool>(new_cap);
         for (auto i : range(data)) {
