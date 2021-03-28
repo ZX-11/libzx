@@ -52,7 +52,7 @@ class hashset {
 public:
     hashset(size_t min_cap = 16) : data(min_cap), occupied(min_cap) {}
 
-    auto& set(convertible_to<T> auto&& element) {
+    auto& put(convertible_to<T> auto&& element) {
         if (cap() == 0 || payload() > 0.6) grow();
         for (size_t i = hash(element) % cap(), j = 0; j < cap(); i = (i+1) % cap(), j++) {
             if (!occupied[i]) {
