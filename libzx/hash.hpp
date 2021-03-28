@@ -11,9 +11,7 @@ inline size_t hash(const char* s) {
 }
 
 inline size_t hash(const string& s) {
-    size_t seed = 131, hash = 0;
-    for (auto p = s.c_str(); *p; p++) hash = hash * seed + *p;
-    return hash;
+    return hash(s.c_str());
 }
 
 inline size_t hash(integral auto i) {
