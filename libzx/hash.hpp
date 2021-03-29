@@ -5,7 +5,7 @@
 namespace libzx {
 
 inline size_t hash(const char* s) {
-    size_t seed = 13131, hash = 0;
+    size_t seed = 1313131, hash = 0;
     while (*s) hash = hash * seed + (*s++);
     return hash;
 }
