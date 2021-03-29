@@ -1,6 +1,8 @@
 #pragma once
+
 #include <optional>
 #include <stdexcept>
+#include <initializer_list>
 #include "hash.hpp"
 #include "range.hpp"
 #include "string.hpp"
@@ -60,6 +62,10 @@ class hashmap {
     }
 public:
     hashmap(size_t min_cap = 16) : data(min_cap), occupied(min_cap) {}
+    hashmap(std::initializer_list<record> l) :
+        data(l.size() + l.size() / 2) , occupied(l.size() + l.size() / 2) {
+        for (auto&& [k, v] : l) set(std::move(k), std::move(v));
+    }
 
     auto& set(convertible_to<K> auto&& key, convertible_to<V> auto&& value) {
         if (cap() == 0 || payload() > 0.75) grow();
