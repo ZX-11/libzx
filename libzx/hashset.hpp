@@ -51,9 +51,13 @@ class hashset {
     }
 public:
     hashset(size_t min_cap = 16) : data(min_cap), occupied(min_cap) {}
+    hashset(std::initializer_list<T> l) :
+        data(l.size() + l.size() / 2) , occupied(l.size() + l.size() / 2) {
+        for (auto&& i : l) put(std::move(i));
+    }
 
     auto& put(convertible_to<T> auto&& element) {
-        if (cap() == 0 || payload() > 0.75) grow();
+        if (cap() == 0 || payload() > 0.7) grow();
         for (size_t i = hash(element) % cap(), j = 0; j < cap(); i = (i+1) % cap(), j++) {
             if (!occupied[i]) {
                 data[i] = std::forward<decltype(element)>(element);
