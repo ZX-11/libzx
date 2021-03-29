@@ -1,5 +1,5 @@
 #pragma once
-
+#include <initializer_list>
 #include "hash.hpp"
 #include "range.hpp"
 #include "concepts.hpp"
