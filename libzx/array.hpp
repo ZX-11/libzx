@@ -44,8 +44,8 @@ public:
     size_t size() const noexcept { return len; }
     T& front() noexcept { return data[0]; }
     T& back() noexcept { return data[len-1]; }
-    T* begin() const noexcept { return &data[0]; }
-    T* end() const noexcept { return &data[len]; }
+    T* begin() const noexcept { return const_cast<T*>(std::begin(data)); }
+    T* end() const noexcept { return const_cast<T*>(std::end(data)); }
 };
 
 }
