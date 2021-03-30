@@ -1,4 +1,5 @@
 #pragma once
+#include <optional>
 #include <stdexcept>
 #include <initializer_list>
 #include "smart_array.hpp"
@@ -23,7 +24,7 @@ protected:
 public:
     vector() : data(16) {}
     vector(size_t len, size_t min_cap = 16) : data(std::max(len + len/3, min_cap)), len(len) {}
-    vector(std::initializer_list<T> l) : data(l.size() + l.size()/3) {
+    vector(std::initializer_list<T> l) : data(l.size() + l.size()/3), len(l.size()) {
         std::move(l.begin(), l.end(), data.get());
     }
     vector(const slice<T>& s) : data(s.size() + s.size()/3), len(s.size()) {
@@ -33,15 +34,19 @@ public:
     vector(vector&& v) : data(v.data), len(v.len) { v.len = 0; }
 
     auto& operator=(const vector& v) {
-        data = std::move(v.data.clone());
-        len = v.len;
+        if (this != &v) {
+            data = std::move(v.data.clone());
+            len = v.len;
+        }
         return *this;
     }
 
     auto& operator=(vector&& v) noexcept {
-        data = std::move(v.data);
-        len = v.len;
-        v.len = 0;
+        if (this != &v) {
+            data = std::move(v.data);
+            len = v.len;
+            v.len = 0;
+        }
         return *this;
     }
 
@@ -51,7 +56,7 @@ public:
         return *this;
     }
 
-    T pop_back() noexcept { return len > 0 ? std::move(data[--len]) : T(); }
+    T pop_back() noexcept { return len > 0 ? std::move(data[--len]) : at(-1); }
 
     T& operator[](size_t i) noexcept { return data[i]; }
 
