@@ -57,7 +57,7 @@ public:
     }
 
     auto& put(convertible_to<T> auto&& element) {
-        if (cap() == 0 || payload() > 0.7) grow();
+        if (cap() == 0 || payload() > 0.6) grow();
         for (size_t i = hash(element) % cap(), j = 0; j < cap(); i = (i+1) % cap(), j++) {
             if (!occupied[i]) {
                 data[i] = std::forward<decltype(element)>(element);
