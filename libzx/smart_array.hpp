@@ -10,23 +10,26 @@ namespace libzx {
 
 template<typename T>
 class unique_array : public std::unique_ptr<T[]> {
+protected:
     using data = std::unique_ptr<T[]>;
     size_t len = 0;
 public:
     unique_array() = default;
     unique_array(size_t size) : data(new T[size]()), len(size) { }
     unique_array(unique_array&& a) : data(a.release()), len(a.len) { a.len = 0; }
-    unique_array(std::initializer_list<T> l) : data(new T[l.size()]) {
+    unique_array(std::initializer_list<T> l) : data(new T[l.size()]), len(l.size()) {
         std::move(l.begin(), l.end(), data::get());
     }
     unique_array(slice<T> s) : data(new T[s.size()]()), len(s.size()) {
         std::copy(s.begin(), s.end(), data::get());
     }
 
-    auto& operator=(unique_array&& a) {
-        data::reset(a.release());
-        len = a.len;
-        a.len = 0;
+    auto& operator=(unique_array&& a) noexcept {
+        if (this != &a) {
+            data::reset(a.release());
+            len = a.len;
+            a.len = 0;
+        }
         return *this;
     }
 
@@ -53,6 +56,7 @@ public:
 
 template<typename T>
 class shared_array : public std::shared_ptr<T[]> {
+protected:
     using data = std::shared_ptr<T[]>;
     size_t len = 0;
 public:
