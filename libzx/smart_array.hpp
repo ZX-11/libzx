@@ -62,10 +62,10 @@ protected:
 public:
     shared_array() = default;
     shared_array(size_t size) : data(new T[size]()), len(size) { }
-    shared_array(std::initializer_list<T> l) : data(new T[l.size()]) {
+    shared_array(std::initializer_list<T> l) : data(new T[l.size()]), len(l.size()) {
         for (auto&& i : l) (*this)[len++] = std::move(i);
     }
-    shared_array(slice<T> s) : data(new T[s.len]()), len(s.len) {
+    shared_array(slice<T> s) : data(new T[s.size()]()), len(s.size()) {
         std::copy(s.begin(), s.end(), data::get());
     }
 
