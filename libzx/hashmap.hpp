@@ -1,5 +1,4 @@
 #pragma once
-
 #include <optional>
 #include <stdexcept>
 #include <initializer_list>
@@ -11,13 +10,12 @@
 
 namespace libzx {
 
-template<hashable K, equalable V>
-struct hashpair { K key; V value; };
-
-template<hashable K, equalable V>
+template<hashable K, typename V>
 class hashmap {
-    using record = hashpair<K,V>;
-    unique_array<record> data;
+public:
+    struct pair { K key; V value; };
+protected:
+    unique_array<pair> data;
     unique_array<bool> occupied;
     size_t len = 0;
     size_t cap() { return data.size(); }
@@ -25,13 +23,13 @@ class hashmap {
 
     void grow() {
         auto new_cap = data.size() * 2 + 1;
-        auto new_data = unique_array<record>(new_cap);
+        auto new_data = unique_array<pair>(new_cap);
         auto new_occupied = unique_array<bool>(new_cap);
         for (auto i : range(data)) {
             if (!occupied[i]) continue;
             for (size_t j = hash(data[i].key) % new_cap, k = 0; k < new_cap; j = (j+1) % new_cap, k++) {
                 if (new_occupied[j]) continue;
-                new_data[j] = record{
+                new_data[j] = pair{
                     std::move(data[i].key),
                     std::move(data[i].value)
                 };
@@ -44,14 +42,14 @@ class hashmap {
     }
 
     auto find(const K& key) {
-        for (size_t i = hash(key) % cap(), j = 0; j < cap(); i = (i+1)%cap(), j++) {
+        for (size_t i = hash(key) % cap(), j = 0; j < cap(); i = (i+1) % cap(), j++) {
             if (occupied[i] && data[i].key == key) {
                 return &data[i];
             } else if (!occupied[i]) {
                 break;
             }
         }
-        return (record*)nullptr;
+        return (pair*)nullptr;
     }
 
     size_t first() {
@@ -62,7 +60,7 @@ class hashmap {
     }
 public:
     hashmap(size_t min_cap = 16) : data(min_cap), occupied(min_cap) {}
-    hashmap(std::initializer_list<record> l) :
+    hashmap(std::initializer_list<pair> l) :
         data(l.size() + l.size() / 2) , occupied(l.size() + l.size() / 2) {
         for (auto&& [k, v] : l) set(std::move(k), std::move(v));
     }
@@ -71,7 +69,7 @@ public:
         if (cap() == 0 || payload() > 0.7) grow();
         for (size_t i = hash(key) % cap(), j = 0; j < cap(); i = (i+1) % cap(), j++) {
             if (!occupied[i]) {
-                data[i] = record{
+                data[i] = pair{
                     std::forward<decltype(key)>(key),
                     std::forward<decltype(value)>(value)
                 };
