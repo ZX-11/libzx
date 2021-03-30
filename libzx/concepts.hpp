@@ -26,7 +26,4 @@ concept convertible_to = std::is_convertible_v<F, T>;
 template<typename T>
 concept integral = std::is_integral_v<T> || std::is_pointer_v<T>;
 
-template<typename T>
-concept hashable = true;    // TODO
-
 }
