@@ -19,4 +19,7 @@ inline size_t hash(integral auto i) {
     return t * 2654435761;
 }
 
+template<typename T>
+concept hashable = requires(T t) { { hash(t) } -> convertible_to<size_t>; t == t; };
+
 }
