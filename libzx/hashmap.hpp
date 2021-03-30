@@ -88,8 +88,8 @@ public:
         return find(key) != nullptr;
     }
 
-    std::optional<std::reference_wrapper<V>> get(const K& key) {
-        if (auto t = find(key); t != nullptr) return std::optional<std::reference_wrapper<V>>(t->value);
+    auto get(const K& key) -> std::optional<std::reference_wrapper<V>> {
+        if (auto t = find(key); t != nullptr) return t->value;
         return std::nullopt;
     }
 
