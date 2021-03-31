@@ -7,15 +7,21 @@ namespace libzx {
 
 template<typename T, size_t N>
 class array {
+protected:
     T data[N];
     const size_t len = N;
 public:
     array() = default;
-    array(std::initializer_list<T> l) {
-        std::move(l.begin(), l.begin() + std::min(l.size(), len), data);
+
+    array(const T (&a)[N]) {
+        std::move(std::begin(a), std::end(a), data);
     }
-    array(slice<T> s) {
-        std::copy(s.begin(), s.begin() + std::min(s.size(), len), data);
+
+    auto& operator=(const array& a) {
+        if (this != &a) {
+            std::copy(std::begin(a.data), std::end(a.data), data);
+        }
+        return *this;
     }
 
     auto operator<=>(const array& a) const {
@@ -31,7 +37,7 @@ public:
         return (*this <=> a) == 0;
     }
 
-    T &at(size_t i) {
+    T& at(size_t i) {
         if (i >= len)
             throw std::out_of_range("array: index (which is " + std::to_string(i) +
                 ") >= this->size() (which is " + std::to_string(len) + ")");
