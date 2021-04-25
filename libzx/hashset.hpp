@@ -9,6 +9,7 @@ namespace libzx {
 
 template<hashable T>
 class hashset {
+protected:
     unique_array<T> data;
     unique_array<bool> occupied;
     size_t len = 0;
@@ -16,7 +17,7 @@ class hashset {
     double payload() { return (double)len / (double)data.size(); }
 
     void grow() {
-        auto new_cap = data.size() * 2 + 1;
+        auto new_cap = (cap() == 0) ? 1 : cap() * 2;
         auto new_data = unique_array<T>(new_cap);
         auto new_occupied = unique_array<bool>(new_cap);
         for (auto i : range(data)) {
@@ -50,9 +51,9 @@ class hashset {
         return data.size();
     }
 public:
-    hashset(size_t min_cap = 16) : data(min_cap), occupied(min_cap) {}
+    hashset(size_t min_cap = 16) : data(bit_floor(min_cap)), occupied(bit_floor(min_cap)) {}
     hashset(std::initializer_list<T> l) :
-        data(l.size() + l.size() / 2) , occupied(l.size() + l.size() / 2) {
+        data(bit_floor(l.size() + l.size()/2)), occupied(bit_floor(l.size() + l.size()/2)) {
         for (auto&& i : l) put(std::move(i));
     }
 

@@ -22,7 +22,7 @@ protected:
     double payload() { return (double)len / (double)data.size(); }
 
     void grow() {
-        auto new_cap = data.size() * 2 + 1;
+        auto new_cap = (cap() == 0) ? 1 : cap() * 2;
         auto new_data = unique_array<pair>(new_cap);
         auto new_occupied = unique_array<bool>(new_cap);
         for (auto i : range(data)) {
@@ -59,9 +59,9 @@ protected:
         return data.size();
     }
 public:
-    hashmap(size_t min_cap = 16) : data(min_cap), occupied(min_cap) {}
+    hashmap(size_t min_cap = 16) : data(bit_floor(min_cap)), occupied(bit_floor(min_cap)) {}
     hashmap(std::initializer_list<pair> l) :
-        data(l.size() + l.size() / 2) , occupied(l.size() + l.size() / 2) {
+        data(bit_floor(l.size() + l.size()/2)), occupied(bit_floor(l.size() + l.size()/2)) {
         for (auto&& [k, v] : l) set(std::move(k), std::move(v));
     }
 
@@ -103,7 +103,7 @@ public:
     }
 
     struct iter {
-        hashmap* map;
+        hashmap* const map;
         size_t index;
         auto& operator++() {
             do {

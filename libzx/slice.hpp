@@ -10,6 +10,7 @@ namespace libzx {
 // it is totally safe, except when vector grows;
 template<typename T>
 class slice {
+protected:
     T *const data;
     const size_t len = 0;
     slice(T* data, size_t len) : data(data), len(len) {}
@@ -17,7 +18,7 @@ public:
     template<size_t N>
     slice(T (&data)[N]) : data(data), len(N) {}
 
-    slice(iterable auto&& data) : data(&(*data.begin())), len(data.end() - data.begin()) {}
+    slice(sliceable auto&& data) : data(&(*data.begin())), len(data.end() - data.begin()) {}
     slice(iterator auto begin, iterator auto end) : data(&(*begin)), len(end - begin) {}
 
     T& operator[](size_t i) noexcept { return data[i]; }
@@ -31,11 +32,13 @@ public:
     }
 
     auto sub(size_t begin, size_t end) {
-        return slice<T>(&at(begin), std::min(end,len)-begin);
+        if (begin > len) at(begin);
+        return slice<T>(data + begin, std::min(end,len)-begin);
     }
 
     auto sub(size_t begin) {
-        return slice<T>(&at(begin), len-begin);
+         if (begin > len) at(begin);
+        return slice<T>(data + begin, len-begin);
     }
 
     auto operator<=>(const slice& s) const {

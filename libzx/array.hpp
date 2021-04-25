@@ -14,7 +14,15 @@ public:
     array() = default;
 
     array(const T (&a)[N]) {
+        std::copy(std::begin(a), std::end(a), data);
+    }
+
+    array(T (&&a)[N]) {
         std::move(std::begin(a), std::end(a), data);
+    }
+
+    array(std::initializer_list<T> l) {
+        std::move(l.begin(), l.begin() + std::min(N, l.size()), data);
     }
 
     auto& operator=(const array& a) {
@@ -46,6 +54,16 @@ public:
     }
 
     T& operator[](size_t i) { return data[i]; }
+
+    auto to_slice(size_t begin) {
+        if (begin > len) at(begin);
+        return slice<T>(data + begin, len-begin);
+    }
+
+    auto to_slice(size_t begin, size_t end) {
+        if (begin > len) at(begin);
+        return slice<T>(data + begin, std::min(end,len)-begin);
+    }
 
     size_t size() const noexcept { return len; }
     T& front() noexcept { return data[0]; }

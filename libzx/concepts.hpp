@@ -1,12 +1,25 @@
 #pragma once
 #include <type_traits>
+
 namespace libzx {
 
 template<typename T>
-concept iterable = requires(T t) { t.begin(); t.end(); t[0]; };
+concept iterable = requires(T t) { t.begin(); t.end(); };
 
 template<typename T>
-concept iterator = requires(T a, T b) { a++; *a; b - a; };
+concept iterator = requires(T t) { t++; *t; t - t; t != t; };
+
+template<typename T>
+concept indexable = requires(T t) { t.size(); t[0]; };
+
+template<typename T>
+concept sliceable = requires(T t) { t.end() - t.begin(); };
+
+template<typename T>
+concept streamable = requires(T t) { t.begin(); t.end(); t.size(); };
+
+template<typename T>
+concept container = requires(T t, size_t s) { T(s); t[s]; };
 
 template<typename T>
 concept comparable = requires(T t) { t <=> t; };

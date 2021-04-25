@@ -31,7 +31,7 @@ public:
         std::copy(s.begin(), s.end(), data.get());
     }
     vector(const vector& v) : data(v.data.clone()), len(v.len) { }
-    vector(vector&& v) : data(v.data), len(v.len) { v.len = 0; }
+    vector(vector&& v) : data(std::move(v.data)), len(v.len) { v.len = 0; }
 
     auto& operator=(const vector& v) {
         if (this != &v) {
@@ -66,6 +66,16 @@ public:
                  ") >= this->size() (which is " + std::to_string(len) + ")");
         else
             return data[i];
+    }
+
+    auto to_slice(size_t begin) {
+        if (begin > len) at(begin);
+        return slice<T>(data + begin, len-begin);
+    }
+
+    auto to_slice(size_t begin, size_t end) {
+        if (begin > len) at(begin);
+        return slice<T>(data + begin, std::min(end,len)-begin);
     }
 
     size_t size() const noexcept { return len; }
