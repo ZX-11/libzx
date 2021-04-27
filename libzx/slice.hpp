@@ -11,8 +11,8 @@ namespace libzx {
 template<typename T>
 class slice {
 protected:
-    T *const data;
-    const size_t len = 0;
+    T* data;
+    size_t len = 0;
     slice(T* data, size_t len) : data(data), len(len) {}
 public:
     template<size_t N>
