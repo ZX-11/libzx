@@ -23,7 +23,7 @@ protected:
     }
 
 public:
-    deque(size_t len, size_t min_cap = 16) : data(std::max(len + len/3, min_cap)), len(len) { }
+    deque(size_t len = 0, size_t min_cap = 16) : data(std::max(len + len/3, min_cap)), len(len) { }
     deque(std::initializer_list<T> l) : data(l.size() + l.size()/3) {
         std::move(l.begin(), l.end(), data.get());
         first = 0, last = l.size();
@@ -36,15 +36,19 @@ public:
     deque(deque&& v) : data(std::move(v.data)), len(v.len) { v.len = 0; }
 
     auto& operator=(const deque& v) {
-        data = std::move(v.data.clone());
-        len = v.len;
+        if (this != &v) {
+            data = std::move(v.data.clone());
+            len = v.len;
+        }
         return *this;
     }
 
     auto& operator=(deque&& v) noexcept {
-        data = std::move(v.data);
-        len = v.len;
-        v.len = 0;
+        if (this != &v) {
+            data = std::move(v.data);
+            len = v.len;
+            v.len = 0;
+        }
         return *this;
     }
 
@@ -56,6 +60,8 @@ public:
         return *this;
     }
 
+    auto& emplace_back(auto&&... a) { return push_back(T(a...)); }
+
     auto& push_front(convertible_to<T> auto&& t) {
         if (len >= cap() - 1 || cap() == 0) grow();
         first = (first == 0) ? data.size()-1 : first-1;
@@ -63,6 +69,8 @@ public:
         len++;
         return *this;
     }
+
+    auto& emplace_front(auto&&... a) { return push_front(T(a...)); }
 
     T pop_back() {
         if (len == 0) return T();

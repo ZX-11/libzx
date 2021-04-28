@@ -22,8 +22,7 @@ protected:
     }
 
 public:
-    vector() : data(16) {}
-    vector(size_t len, size_t min_cap = 16) : data(std::max(len + len/3, min_cap)), len(len) {}
+    vector(size_t len = 0, size_t min_cap = 16) : data(std::max(len + len/3, min_cap)), len(len) {}
     vector(std::initializer_list<T> l) : data(l.size() + l.size()/3), len(l.size()) {
         std::move(l.begin(), l.end(), data.get());
     }
@@ -35,7 +34,7 @@ public:
 
     auto& operator=(const vector& v) {
         if (this != &v) {
-            data = std::move(v.data.clone());
+            data = v.data.clone();
             len = v.len;
         }
         return *this;
@@ -55,6 +54,8 @@ public:
         data[len++] = std::forward<decltype(t)>(t);
         return *this;
     }
+
+    auto& emplace_back(auto&&... a) { return push_back(T(a...)); }
 
     T pop_back() { return len > 0 ? std::move(data[--len]) : at(-1); }
 
