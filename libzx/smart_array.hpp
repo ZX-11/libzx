@@ -35,7 +35,7 @@ public:
 
     auto clone() const {
         unique_array n(len);
-        std::copy(n.begin(), n.end(), data::get());
+        std::copy(data::get(), data::get()+len, n.get());
         return n;
     }
     
@@ -71,7 +71,7 @@ public:
 
     auto clone() const {
         shared_array n(len);
-        std::copy(n.begin(), n.end(), data::get());
+        std::copy(data::get(), data::get()+len, n.get());
         return n;
     }
 

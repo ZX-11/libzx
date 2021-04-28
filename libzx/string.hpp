@@ -11,7 +11,7 @@ public:
     string(char c) :  vector{c} { }
     string(char* s) : vector(strlen(s)) { strcpy(begin(), s); }
     template<size_t N>
-    string(const char (&s)[N]) :   vector(N) { strcpy(begin(), s); }
+    string(const char (&s)[N]) :   vector(N-1) { strcpy(begin(), s); }
     string(const string& s) :      vector(s.size())  { strcpy(begin(), s.begin()); }
     string(string&& s) :           vector(s.size())  { data = std::move(s.data); s.len = 0; }
     string(const slice<char>& s) : vector(s.size())  { strncpy(begin(), s.begin(), s.size()); }
