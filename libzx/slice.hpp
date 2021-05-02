@@ -11,16 +11,22 @@ namespace libzx {
 template<typename T>
 class slice {
 protected:
-    T *data;
+    T* data = nullptr;
     size_t len = 0;
     slice(T* data, size_t len) : data(data), len(len) {}
 public:
+    slice() = default;
     template<size_t N>
-    slice(T (&data)[N]) : data(data), len(N) {}
-
-    slice(sliceable auto&& data) : data(&(*data.begin())), len(data.end() - data.begin()) {}
-    slice(continuous_iterator auto begin, continuous_iterator auto end) : data(&(*begin)), len(end - begin) {}
-
+    slice(T (&data)[N], size_t begin = 0, size_t end = SIZE_MAX) :
+        data(&data[begin]),
+        len(std::min(end, N) - begin) {
+            if constexpr (std::is_same_v<T, const char>) len -= 1;
+        }
+    slice(sliceable auto&& data, size_t begin = 0, size_t end = SIZE_MAX) :
+        data(&(*data.begin()) + begin),
+        len(std::min(end, static_cast<size_t>(data.end() - data.begin())) - begin) {}
+    slice(continuous_iterator auto begin, continuous_iterator auto end) :
+        data(&(*begin)), len(end - begin) {}
     T& operator[](size_t i) noexcept { return data[i]; }
 
     T& at(size_t i) {
@@ -31,14 +37,9 @@ public:
             return data[i];
     }
 
-    auto sub(size_t begin, size_t end) {
+    auto sub(size_t begin, size_t end = SIZE_MAX) {
         if (begin > len) at(begin);
-        return slice<T>(data + begin, std::min(end,len)-begin);
-    }
-
-    auto sub(size_t begin) {
-         if (begin > len) at(begin);
-        return slice<T>(data + begin, len-begin);
+        return slice<T>(data + begin, std::min(end, len) - begin);
     }
 
     auto operator<=>(const slice& s) const {
@@ -61,5 +62,21 @@ public:
     T* begin() const noexcept { return data; }
     T* end() const noexcept { return data + len; }
 };
+
+template<size_t N>
+inline auto operator<=>(slice<char>& s1, const char (&s2)[N]) {
+    if (s1.size() != N-1) return s1.size() <=> N-1;
+    for (size_t i = 0; i < N-2; i++) {
+        if (s1[i] != s2[i]) {
+            return s1[i] <=> s2[i];
+        }
+    }
+    return s1.back() <=> s2[N-2];
+}
+
+template<size_t N>
+inline auto operator==(slice<char>& s1, const char (&s2)[N]) {
+    return (s1 <=> s2) == 0;
+}
 
 }
