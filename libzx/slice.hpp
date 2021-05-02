@@ -19,9 +19,7 @@ public:
     template<size_t N>
     slice(T (&data)[N], size_t begin = 0, size_t end = SIZE_MAX) :
         data(&data[begin]),
-        len(std::min(end, N) - begin) {
-            if constexpr (std::is_same_v<T, const char>) len -= 1;
-        }
+        len(std::min(end, N) - begin) {}
     slice(sliceable auto&& data, size_t begin = 0, size_t end = SIZE_MAX) :
         data(&(*data.begin()) + begin),
         len(std::min(end, static_cast<size_t>(data.end() - data.begin())) - begin) {}
