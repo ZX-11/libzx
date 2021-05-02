@@ -1,4 +1,5 @@
 #pragma once
+#include <bit>
 #include <optional>
 #include <stdexcept>
 #include <initializer_list>
@@ -14,19 +15,19 @@ protected:
     size_t len = 0;
     size_t cap() { return data.size(); }
 
-    void grow(size_t size = 1) {
-        auto new_cap = std::max(data.size() * 2, data.size() + size);
+    void grow(size_t size = 2) {
+        auto new_cap = std::bit_ceil(data.size() + size);
         auto new_data = unique_array<T>(new_cap);
         std::move(data.begin(), data.end(), new_data.begin());
         data = std::move(new_data);
     }
-
+    vector(size_t len, bool for_string) : data(std::bit_ceil(std::max(len+1, (size_t)16))), len(len) {}
 public:
-    vector(size_t len = 0, size_t min_cap = 16) : data(std::max(len + len/3, min_cap)), len(len) {}
-    vector(std::initializer_list<T> l) : data(l.size() + l.size()/3), len(l.size()) {
+    vector(size_t len = 0, size_t min_cap = 16) : data(std::bit_ceil(std::max(len, min_cap))), len(len) {}
+    vector(std::initializer_list<T> l) : data(std::bit_ceil(l.size())), len(l.size()) {
         std::move(l.begin(), l.end(), data.get());
     }
-    vector(const slice<T>& s) : data(s.size() + s.size()/3), len(s.size()) {
+    vector(const slice<T>& s) : data(std::bit_ceil(s.size())), len(s.size()) {
         std::copy(s.begin(), s.end(), data.get());
     }
     vector(const vector& v) : data(v.data.clone()), len(v.len) { }

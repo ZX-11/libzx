@@ -51,9 +51,9 @@ protected:
         return data.size();
     }
 public:
-    hashset(size_t min_cap = 16) : data(bit_floor(min_cap)), occupied(bit_floor(min_cap)) {}
+    hashset(size_t min_cap = 16) : data(std::bit_ceil(min_cap)), occupied(std::bit_ceil(min_cap)) {}
     hashset(std::initializer_list<T> l) :
-        data(bit_floor(l.size() + l.size()/2)), occupied(bit_floor(l.size() + l.size()/2)) {
+        data(std::bit_ceil(l.size() + l.size()/2)), occupied(std::bit_ceil(l.size() + l.size()/2)) {
         for (auto&& i : l) put(std::move(i));
     }
 

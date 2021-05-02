@@ -59,9 +59,9 @@ protected:
         return data.size();
     }
 public:
-    hashmap(size_t min_cap = 16) : data(bit_floor(min_cap)), occupied(bit_floor(min_cap)) {}
+    hashmap(size_t min_cap = 16) : data(std::bit_ceil(min_cap)), occupied(std::bit_ceil(min_cap)) {}
     hashmap(std::initializer_list<pair> l) :
-        data(bit_floor(l.size() + l.size()/2)), occupied(bit_floor(l.size() + l.size()/2)) {
+        data(std::bit_ceil(l.size() + l.size()/2)), occupied(std::bit_ceil(l.size() + l.size()/2)) {
         for (auto&& [k, v] : l) set(std::move(k), std::move(v));
     }
 

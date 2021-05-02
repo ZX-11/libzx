@@ -7,7 +7,10 @@ template<typename T>
 concept iterable = requires(T t) { t.begin(); t.end(); };
 
 template<typename T>
-concept iterator = requires(T t) { t++; *t; t - t; t != t; };
+concept iterator = requires(T t) { t++; *t; t != t; };
+
+template<typename T>
+concept continuous_iterator = requires(T t) { t++; *t; t - t; t != t; };
 
 template<typename T>
 concept indexable = requires(T t) { t.size(); t[0]; };

@@ -11,7 +11,7 @@ namespace libzx {
 template<typename T>
 class slice {
 protected:
-    T* data;
+    T *data;
     size_t len = 0;
     slice(T* data, size_t len) : data(data), len(len) {}
 public:
@@ -19,7 +19,7 @@ public:
     slice(T (&data)[N]) : data(data), len(N) {}
 
     slice(sliceable auto&& data) : data(&(*data.begin())), len(data.end() - data.begin()) {}
-    slice(iterator auto begin, iterator auto end) : data(&(*begin)), len(end - begin) {}
+    slice(continuous_iterator auto begin, continuous_iterator auto end) : data(&(*begin)), len(end - begin) {}
 
     T& operator[](size_t i) noexcept { return data[i]; }
 

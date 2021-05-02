@@ -12,7 +12,7 @@ protected:
     size_t cap() { return data.size(); }
 
     void grow(size_t size = 2) {
-        auto new_cap = std::max(data.size() * 2, data.size() + size);
+        auto new_cap = std::bit_ceil(data.size() + size);
         auto new_data = unique_array<T>(new_cap);
         std::move(data.begin(), data.begin() + last, new_data.begin());
         if (first > last) {
@@ -23,12 +23,12 @@ protected:
     }
 
 public:
-    deque(size_t len = 0, size_t min_cap = 16) : data(std::max(len + len/3, min_cap)), len(len) { }
-    deque(std::initializer_list<T> l) : data(l.size() + l.size()/3) {
+    deque(size_t len = 0, size_t min_cap = 16) : data(std::bit_ceil(std::max(len, min_cap))), len(len) { }
+    deque(std::initializer_list<T> l) : data(std::bit_ceil(l.size())) {
         std::move(l.begin(), l.end(), data.get());
         first = 0, last = l.size();
     }
-    deque(const slice<T>& s) : data(s.size() + s.size()/3), len(s.size()) {
+    deque(const slice<T>& s) : data(std::bit_ceil(s.size())), len(s.size()) {
         std::copy(s.begin(), s.end(), data.get());
         first = 0, last = s.size();
     }
