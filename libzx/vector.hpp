@@ -21,13 +21,12 @@ protected:
         std::move(data.begin(), data.end(), new_data.begin());
         data = std::move(new_data);
     }
-    vector(size_t len, bool for_string) : data(std::bit_ceil(std::max(len+1, (size_t)16))), len(len) {}
 public:
-    vector(size_t len = 0, size_t min_cap = 16) : data(std::bit_ceil(std::max(len, min_cap))), len(len) {}
-    vector(std::initializer_list<T> l) : data(std::bit_ceil(l.size())), len(l.size()) {
+    vector(size_t len = 0, size_t min_cap = 16) : data(std::max(std::bit_ceil(len+1), min_cap)), len(len) {}
+    vector(std::initializer_list<T> l) : data(std::max(std::bit_ceil(l.size()+1), (size_t)16)), len(l.size()) {
         std::move(l.begin(), l.end(), data.get());
     }
-    vector(const slice<T>& s) : data(std::bit_ceil(s.size())), len(s.size()) {
+    vector(const slice<T>& s) : data(std::max(std::bit_ceil(s.size()+1), (size_t)16)), len(s.size()) {
         std::copy(s.begin(), s.end(), data.get());
     }
     vector(const vector& v) : data(v.data.clone()), len(v.len) { }
@@ -68,16 +67,6 @@ public:
                  ") >= this->size() (which is " + std::to_string(len) + ")");
         else
             return data[i];
-    }
-
-    auto to_slice(size_t begin) {
-        if (begin > len) at(begin);
-        return slice<T>(data + begin, len-begin);
-    }
-
-    auto to_slice(size_t begin, size_t end) {
-        if (begin > len) at(begin);
-        return slice<T>(data + begin, std::min(end,len)-begin);
     }
 
     size_t size() const noexcept { return len; }

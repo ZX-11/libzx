@@ -11,8 +11,10 @@ template<typename T>
 class stream {
 public:
     struct pair { T value; bool exist; };
+protected:
     deque<pair> queue;
     size_t exist = 0;
+public:
     stream() = default;
     stream(streamable auto&& s) : queue(s.size()), exist(s.size()) {
         for (auto&& i : s) {

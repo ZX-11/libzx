@@ -10,75 +10,83 @@ namespace libzx {
 template<hashable T>
 class hashset {
 protected:
+    struct status { uint8_t occupied : 1, conflict : 1; };
+
     unique_array<T> data;
-    unique_array<bool> occupied;
+    unique_array<status> state;
     size_t len = 0;
     size_t cap() { return data.size(); }
     double payload() { return (double)len / (double)data.size(); }
 
     void grow() {
-        auto new_cap = (cap() == 0) ? 1 : cap() * 2;
+        auto new_cap = data.size() * 2 + 1;
         auto new_data = unique_array<T>(new_cap);
-        auto new_occupied = unique_array<bool>(new_cap);
-        for (auto i : range(data)) {
-            if (!occupied[i]) continue;
+        auto new_state = unique_array<status>(new_cap);
+        for (auto i : urange(data)) {
+            if (!state[i].occupied) continue;
             for (size_t j = hash(data[i]) % new_cap, k = 0; k < new_cap; j = (j+1) % new_cap, k++) {
-                if (new_occupied[j]) continue;
+                if (new_state[j].occupied) {
+                    new_state[j].conflict = true;
+                    continue;
+                }
                 new_data[j] = std::move(data[i]);
-                new_occupied[j] = true;
+                new_state[j].occupied = true;
                 break;
             }
         }
         data = std::move(new_data);
-        occupied = std::move(new_occupied);
+        state = std::move(new_state);
     }
 
-    auto find(const T& element) {
-        for (size_t i = hash(element) % cap(), j = 0; j < cap(); i = (i+1)%cap(), j++) {
-            if (occupied[i] && data[i] == element) {
+    auto find(const T& key) -> T* {
+        for (size_t i = hash(key) % cap(), j = 0; j < cap(); i = (i+1) % cap(), j++) {
+            if (state[i].occupied && data[i] == key) {
                 return &data[i];
-            } else if (!occupied[i]) {
+            }
+            if (!state[i].conflict) {
                 break;
             }
         }
-        return (T*)nullptr;
+        return nullptr;
     }
 
     size_t first() {
-        for (auto i : range(data)) {
-            if (occupied[i]) return i;
+        for (auto i : urange(data)) {
+            if (state[i].occupied) return i;
         }
         return data.size();
     }
 public:
-    hashset(size_t min_cap = 16) : data(std::bit_ceil(min_cap)), occupied(std::bit_ceil(min_cap)) {}
+    hashset(size_t min_cap = 16) : data(min_cap), state(min_cap) {}
     hashset(std::initializer_list<T> l) :
-        data(std::bit_ceil(l.size() + l.size()/2)), occupied(std::bit_ceil(l.size() + l.size()/2)) {
+        data(l.size() + l.size() / 2) , state(l.size() + l.size() / 2) {
         for (auto&& i : l) put(std::move(i));
     }
 
-    auto& put(convertible_to<T> auto&& element) {
+    auto& put(convertible_to<T> auto&& key) {
         if (cap() == 0 || payload() > 0.6) grow();
-        for (size_t i = hash(element) % cap(), j = 0; j < cap(); i = (i+1) % cap(), j++) {
-            if (!occupied[i]) {
-                data[i] = std::forward<decltype(element)>(element);
-                occupied[i] = true;
+        for (size_t i = hash(key) % cap(), j = 0; j < cap(); i = (i+1) % cap(), j++) {
+            if (!state[i].occupied) {
+                data[i] = std::forward<decltype(key)>(key);
+                state[i].occupied = true;
                 len++;
                 break;
-            } else if (data[i] == element) {
+            } else if (data[i] == key) {
                 break;
+            } else {
+                state[i].conflict = true;
             }
         }
         return *this;
     }
 
-    bool contains(const T& element) {
-        return find(element) != nullptr;
+    bool contains(const T& key) {
+        return find(key) != nullptr;
     }
 
-    auto remove(const T& element) {
-        if (auto t = find(element); t != nullptr) {
-            occupied[t - data.begin()] = false;
+    auto remove(const T& key) {
+        if (auto t = find(key); t != nullptr) {
+            state[t - data.begin()].occupied = false;
             len--;
             return true;
         }
@@ -86,12 +94,12 @@ public:
     }
 
     struct iter {
-        hashset* set;
+        hashset* const set;
         size_t index;
         auto& operator++() {
             do {
                 index++;
-            } while (index < set->data.size() && !set->occupied[index]);
+            } while (index < set->data.size() && !set->state[index].occupied);
             return *this;
         }
         auto operator!=(iter& i) { return index != i.index; }
@@ -100,6 +108,7 @@ public:
 
     auto begin() { return iter{ this, first() }; }
     auto end() { return iter{ this, data.size() }; }
+    auto size() { return len; }
 };
 
 }

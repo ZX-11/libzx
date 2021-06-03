@@ -55,16 +55,6 @@ public:
 
     T& operator[](size_t i) { return data[i]; }
 
-    auto to_slice(size_t begin) {
-        if (begin > len) at(begin);
-        return slice<T>(data + begin, len-begin);
-    }
-
-    auto to_slice(size_t begin, size_t end) {
-        if (begin > len) at(begin);
-        return slice<T>(data + begin, std::min(end,len)-begin);
-    }
-
     size_t size() const noexcept { return len; }
     T& front() noexcept { return data[0]; }
     T& back() noexcept { return data[len-1]; }

@@ -17,7 +17,7 @@ public:
     unique_array() = default;
     unique_array(size_t size) : data(new T[size]()), len(size) { }
     unique_array(unique_array&& a) : data(a.release()), len(a.len) { a.len = 0; }
-    unique_array(std::initializer_list<T> l) : data(new T[l.size()]), len(l.size()) {
+    unique_array(std::initializer_list<T> l) : data(new T[l.size()]()), len(l.size()) {
         std::move(l.begin(), l.end(), data::get());
     }
     unique_array(slice<T> s) : data(new T[s.size()]()), len(s.size()) {
@@ -62,7 +62,7 @@ protected:
 public:
     shared_array() = default;
     shared_array(size_t size) : data(new T[size]()), len(size) { }
-    shared_array(std::initializer_list<T> l) : data(new T[l.size()]), len(l.size()) {
+    shared_array(std::initializer_list<T> l) : data(new T[l.size()]()), len(l.size()) {
         for (auto&& i : l) (*this)[len++] = std::move(i);
     }
     shared_array(slice<T> s) : data(new T[s.size()]()), len(s.size()) {

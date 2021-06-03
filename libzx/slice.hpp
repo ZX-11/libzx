@@ -21,10 +21,11 @@ public:
         data(&data[begin]),
         len(std::min(end, N) - begin) {}
     slice(sliceable auto&& data, size_t begin = 0, size_t end = SIZE_MAX) :
-        data(&(*data.begin()) + begin),
+        data(&(*(data.begin() + begin))),
         len(std::min(end, static_cast<size_t>(data.end() - data.begin())) - begin) {}
     slice(continuous_iterator auto begin, continuous_iterator auto end) :
         data(&(*begin)), len(end - begin) {}
+        
     T& operator[](size_t i) noexcept { return data[i]; }
 
     T& at(size_t i) {

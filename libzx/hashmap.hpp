@@ -1,10 +1,8 @@
 #pragma once
 #include <optional>
-#include <stdexcept>
 #include <initializer_list>
 #include "hash.hpp"
 #include "range.hpp"
-#include "string.hpp"
 #include "concepts.hpp"
 #include "smart_array.hpp"
 
@@ -15,70 +13,78 @@ class hashmap {
 public:
     struct pair { K key; V value; };
 protected:
+    struct status { uint8_t occupied : 1, conflict : 1; };
+
     unique_array<pair> data;
-    unique_array<bool> occupied;
+    unique_array<status> state;
     size_t len = 0;
     size_t cap() { return data.size(); }
     double payload() { return (double)len / (double)data.size(); }
 
     void grow() {
-        auto new_cap = (cap() == 0) ? 1 : cap() * 2;
+        auto new_cap = data.size() * 2 + 1;
         auto new_data = unique_array<pair>(new_cap);
-        auto new_occupied = unique_array<bool>(new_cap);
-        for (auto i : range(data)) {
-            if (!occupied[i]) continue;
+        auto new_state = unique_array<status>(new_cap);
+        for (auto i : urange(data)) {
+            if (!state[i].occupied) continue;
             for (size_t j = hash(data[i].key) % new_cap, k = 0; k < new_cap; j = (j+1) % new_cap, k++) {
-                if (new_occupied[j]) continue;
+                if (new_state[j].occupied) {
+                    new_state[j].conflict = true;
+                    continue;
+                }
                 new_data[j] = pair{
                     std::move(data[i].key),
                     std::move(data[i].value)
                 };
-                new_occupied[j] = true;
+                new_state[j].occupied = true;
                 break;
             }
         }
         data = std::move(new_data);
-        occupied = std::move(new_occupied);
+        state = std::move(new_state);
     }
 
-    auto find(const K& key) {
+    auto find(const K& key) -> pair* {
         for (size_t i = hash(key) % cap(), j = 0; j < cap(); i = (i+1) % cap(), j++) {
-            if (occupied[i] && data[i].key == key) {
+            if (state[i].occupied && data[i].key == key) {
                 return &data[i];
-            } else if (!occupied[i]) {
+            }
+            if (!state[i].conflict) {
                 break;
             }
         }
-        return (pair*)nullptr;
+        return nullptr;
     }
 
     size_t first() {
-        for (auto i : range(data)) {
-            if (occupied[i]) return i;
+        for (auto i : urange(data)) {
+            if (state[i].occupied) return i;
         }
         return data.size();
     }
 public:
-    hashmap(size_t min_cap = 16) : data(std::bit_ceil(min_cap)), occupied(std::bit_ceil(min_cap)) {}
+    hashmap(size_t min_cap = 16) : data(min_cap), state(min_cap) {}
     hashmap(std::initializer_list<pair> l) :
-        data(std::bit_ceil(l.size() + l.size()/2)), occupied(std::bit_ceil(l.size() + l.size()/2)) {
+        data(l.size() + l.size() / 2) , state(l.size() + l.size() / 2) {
         for (auto&& [k, v] : l) set(std::move(k), std::move(v));
     }
 
     auto& set(convertible_to<K> auto&& key, convertible_to<V> auto&& value) {
         if (cap() == 0 || payload() > 0.6) grow();
         for (size_t i = hash(key) % cap(), j = 0; j < cap(); i = (i+1) % cap(), j++) {
-            if (!occupied[i]) {
+            if (!state[i].occupied) {
                 data[i] = pair{
                     std::forward<decltype(key)>(key),
                     std::forward<decltype(value)>(value)
                 };
-                occupied[i] = true;
+                state[i].occupied = true;
                 len++;
                 break;
             } else if (data[i].key == key) {
                 data[i].value = std::forward<decltype(value)>(value);
                 break;
+            } else {
+                state[i].conflict = true;
             }
         }
         return *this;
@@ -95,7 +101,7 @@ public:
 
     auto remove(const K& key) {
         if (auto t = find(key); t != nullptr) {
-            occupied[t - data.begin()] = false;
+            state[t - data.begin()].occupied = false;
             len--;
             return true;
         }
@@ -108,7 +114,7 @@ public:
         auto& operator++() {
             do {
                 index++;
-            } while (index < map->data.size() && !map->occupied[index]);
+            } while (index < map->data.size() && !map->state[index].occupied);
             return *this;
         }
         auto operator!=(iter& i) { return index != i.index; }
@@ -117,6 +123,7 @@ public:
 
     auto begin() { return iter{ this, first() }; }
     auto end() { return iter{ this, data.size() }; }
+    auto size() { return len; }
 };
 
 }

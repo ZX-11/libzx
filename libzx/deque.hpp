@@ -104,7 +104,7 @@ public:
 
     friend class iter;
     struct iter {
-        deque *const d;
+        deque* const d;
         T* current;
         auto& operator++() {
             if (current == &d->data.back()) {
